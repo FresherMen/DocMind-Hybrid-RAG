@@ -158,7 +158,8 @@ async def ingest(files: List[UploadFile] = File(...)):
     require_engine()
     results = []
     for uf in files:
-        suffix = Path(uf.filename).suffix
+        raw_name = uf.filename or "uploaded_document.txt"
+        suffix = Path(raw_name).suffix
         if suffix.lower() not in (".pdf", ".txt", ".md"):
             raise HTTPException(400, f"Unsupported file type: {suffix}")
 
@@ -181,10 +182,13 @@ async def ingest(files: List[UploadFile] = File(...)):
 @app.post("/query", response_model=QueryResponse, summary="Ask a question (hybrid RAG)")
 async def query(req: QueryRequest):
     require_engine()
-    if req.top_k:
-        engine.top_k = req.top_k
     try:
+        # Use requested top_k per query without mutating global engine default
+        effective_k = req.top_k if req.top_k is not None else engine.top_k
+        original_k = engine.top_k
+        engine.top_k = effective_k
         resp = engine.query(req.question)
+        engine.top_k = original_k
         return serialize_response(resp)
     except Exception as e:
         logger.error(f"Query error: {e}", exc_info=True)
