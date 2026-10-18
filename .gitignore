@@ -1,0 +1,80 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# C extensions
+.Python
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environments
+venv/
+env/
+myenv/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment Variables & Secrets (CRITICAL)
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*.key
+
+# Vector Store / Local Databases / Runtime state
+chroma_store/
+chroma_db/
+*.sqlite3
+*.sqlite
+c46175f6-*
+
+# Generated notes from agents (keep folder structure)
+02-Autonomous-Research-Agent/notes/*.md
+!02-Autonomous-Research-Agent/notes/.gitkeep
+notes/*.md
+!notes/.gitkeep
+
+# Node / Web UI dependencies & build artifacts
+node_modules/
+.npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.vite/
+*.local
+
+# Operating System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE and Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
