@@ -1,4 +1,4 @@
-# ⬡ DocMind v2 — Production RAG System
+# DocMind v2 — Production RAG System
 
 > A senior-level Retrieval-Augmented Generation system featuring **hybrid search**, **Reciprocal Rank Fusion**, **query expansion**, **contextual compression**, and **RAGAS-style evaluation** — deployed as a FastAPI + React full-stack application with Docker.
 
@@ -10,7 +10,7 @@
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -26,19 +26,19 @@
 ┌────────────────────────▼────────────────────────────────────────┐
 │                       RAG Engine                                │
 │                                                                 │
-│  ① Query Expansion (multi-query generation via LLM)            │
+│  1. Query Expansion (multi-query generation via LLM)           │
 │       ↓                                                         │
-│  ② Dense Retrieval   ③ Sparse Retrieval (BM25)                │
+│  2. Dense Retrieval   3. Sparse Retrieval (BM25)               │
 │     (ChromaDB +          (lexical keyword                       │
 │      cosine sim)          matching)                             │
 │       ↓                      ↓                                  │
-│  ④ Reciprocal Rank Fusion (RRF)                                │
+│  4. Reciprocal Rank Fusion (RRF)                               │
 │       ↓                                                         │
-│  ⑤ Contextual Compression (LLM strips noise from chunks)      │
+│  5. Contextual Compression (LLM strips noise from chunks)      │
 │       ↓                                                         │
-│  ⑥ Answer Generation (GPT-4o-mini with grounded context)      │
+│  6. Answer Generation (GPT-4o-mini with grounded context)      │
 │       ↓                                                         │
-│  ⑦ RAGAS-style Evaluation (faithfulness · relevancy · precision)│
+│  7. RAGAS-style Evaluation (faithfulness · relevancy · precision)│
 └─────────────────────────────────────────────────────────────────┘
          │                              │
    ChromaDB (persistent)          BM25 Index (session)
@@ -46,12 +46,12 @@
 
 ---
 
-## ✨ Key Technical Features
+## Key Technical Features
 
 ### Retrieval
 | Technique | Description |
 |---|---|
-| **Dense retrieval** | ChromaDB + OpenAI `text-embedding-3-small`, cosine similarity |
+| **Dense retrieval** | ChromaDB + OpenAI `text-embedding-3-small` / MiniLM, cosine similarity |
 | **Sparse retrieval** | BM25 lexical matching for exact keyword coverage |
 | **RRF fusion** | Reciprocal Rank Fusion combines dense + sparse rankings without score normalization |
 | **Query expansion** | LLM generates N query variants to improve recall across semantic space |
@@ -60,7 +60,7 @@
 ### Generation & Evaluation
 | Feature | Description |
 |---|---|
-| **Grounded generation** | GPT-4o-mini answers strictly from retrieved context with inline citations |
+| **Grounded generation** | GPT-4o-mini / Llama 3 answers strictly from retrieved context with inline citations |
 | **RAGAS-style eval** | LLM-judged: Faithfulness, Answer Relevancy, Context Precision, Confidence |
 | **Multi-doc comparison** | Per-document answers + cross-source synthesis in a single request |
 | **Structured outputs** | All responses are typed Pydantic models serialized as JSON |
@@ -75,7 +75,7 @@
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Option A — Docker (recommended)
 
@@ -111,7 +111,7 @@ VITE_API_URL=http://localhost:8000 npm run dev
 
 ---
 
-## 📡 API Reference
+## API Reference
 
 | Method | Endpoint | Description |
 |---|---|---|
@@ -159,10 +159,10 @@ curl -X POST http://localhost:8000/query \
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
-docmind-v2/
+DocMind-Hybrid-RAG/
 ├── backend/
 │   ├── core/
 │   │   └── rag_engine.py       # Hybrid RAG: dense + BM25 + RRF + eval
@@ -181,34 +181,36 @@ docmind-v2/
 │   │       └── SourcePanel.jsx  # Slide-over with RRF scores
 │   └── Dockerfile
 ├── docker-compose.yml
+├── .env.example
+├── LICENSE
 └── README.md
 ```
 
 ---
 
-## 🧠 Design Decisions
+## Design Decisions
 
-**Why hybrid search (dense + BM25)?**
-Dense retrieval excels at semantic similarity but can miss exact keyword matches. BM25 captures lexical overlap but doesn't understand meaning. RRF fusion captures both without requiring score normalization.
+**Why hybrid search (dense + BM25)?**  
+Dense retrieval excels at semantic similarity but can miss exact keyword matches. BM25 captures lexical overlap but does not understand meaning. RRF fusion captures both without requiring score normalization.
 
-**Why query expansion?**
+**Why query expansion?**  
 A single query may not cover the embedding space where relevant chunks live. Generating 2–3 rephrased variants improves recall by 15–30% in typical RAG evaluations.
 
-**Why contextual compression?**
+**Why contextual compression?**  
 Retrieved chunks often contain noise — sentences unrelated to the specific question. Compressing each chunk before generation reduces hallucination risk and improves faithfulness scores.
 
-**Why RAGAS-style self-evaluation?**
+**Why RAGAS-style self-evaluation?**  
 Confidence scoring based purely on vector similarity is unreliable. LLM-judged evaluation provides a more semantically meaningful quality signal correlated with actual answer correctness.
 
 ---
 
-## 💼 Resume Bullet Points
+## Engineering Highlights
 
 > *"Architected a production RAG system with hybrid retrieval (dense embeddings + BM25), Reciprocal Rank Fusion, LLM-powered query expansion, and contextual chunk compression; deployed as a FastAPI + React + Docker full-stack application with RAGAS-style automated evaluation metrics."*
 
 ---
 
-## 🛠️ Roadmap
+## Roadmap
 
 - [ ] Cross-encoder reranking (ColBERT / ms-marco-MiniLM)
 - [ ] Streaming responses via Server-Sent Events
@@ -218,6 +220,6 @@ Confidence scoring based purely on vector similarity is unreliable. LLM-judged e
 
 ---
 
-## 📄 License
+## License
 
 MIT
