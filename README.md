@@ -7,6 +7,7 @@
 ![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square)
 ![ChromaDB](https://img.shields.io/badge/VectorDB-ChromaDB-orange?style=flat-square)
 ![Docker](https://img.shields.io/badge/Deploy-Docker-2496ED?style=flat-square)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Ankur%20Pal-0A66C2?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/ankur-pal-2b2ba9433)
 
 ---
 
@@ -217,6 +218,15 @@ Confidence scoring based purely on vector similarity is unreliable. LLM-judged e
 - [ ] RAGAS library integration for offline batch eval
 - [ ] Multi-tenancy with document namespacing
 - [ ] Observability: LangSmith / Langfuse tracing
+
+---
+
+## Author & Connect
+
+**Ankur Pal**  
+- **LinkedIn:** [Ankur Pal](https://www.linkedin.com/in/ankur-pal-2b2ba9433)  
+- **GitHub:** [@FresherMen](https://github.com/FresherMen)  
+- **Portfolio:** [freshermen.github.io](https://freshermen.github.io)  
 
 ---
 
