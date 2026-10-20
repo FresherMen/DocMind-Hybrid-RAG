@@ -169,7 +169,7 @@ async def ingest(files: List[UploadFile] = File(...)):
             tmp_path = tmp.name
 
         try:
-            result = engine.ingest_file(tmp_path)
+            result = engine.ingest_file(tmp_path, doc_name=raw_name)
             results.append(vars(result))
         except Exception as e:
             raise HTTPException(500, str(e))

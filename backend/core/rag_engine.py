@@ -201,13 +201,14 @@ Context:
 
     # ── Ingestion ──────────────────────────────────────────────────────────────
 
-    def ingest_file(self, file_path: str) -> IngestionResult:
+    def ingest_file(self, file_path: str, doc_name: Optional[str] = None) -> IngestionResult:
         path = Path(file_path)
         if not path.exists():
             raise FileNotFoundError(f"{file_path}")
 
+        display_name = doc_name or path.name
         t0 = time.time()
-        ext = path.suffix.lower()
+        ext = Path(display_name).suffix.lower() or path.suffix.lower()
 
         if ext == ".pdf":
             loader = PyPDFLoader(str(path))
@@ -218,12 +219,12 @@ Context:
 
         raw_docs = loader.load()
         for doc in raw_docs:
-            doc.metadata.update({"source_name": path.name, "file_path": str(path)})
+            doc.metadata.update({"source_name": display_name, "file_path": str(path)})
 
         chunks = self.splitter.split_documents(raw_docs)
         for i, chunk in enumerate(chunks):
             h = hashlib.md5(chunk.page_content.encode()).hexdigest()[:8]
-            chunk.metadata["chunk_id"] = f"{path.stem}_{i}_{h}"
+            chunk.metadata["chunk_id"] = f"{Path(display_name).stem}_{i}_{h}"
 
         # Add to ChromaDB
         self.vectorstore.add_documents(chunks)
@@ -234,15 +235,15 @@ Context:
 
         elapsed = int((time.time() - t0) * 1000)
         result = IngestionResult(
-            doc_name=path.name,
+            doc_name=display_name,
             chunks=len(chunks),
             pages=len(raw_docs),
             size_kb=round(path.stat().st_size / 1024, 1),
             embed_time_ms=elapsed,
             status="success",
         )
-        self.doc_registry[path.name] = result
-        logger.info(f"Ingested {path.name}: {len(chunks)} chunks in {elapsed}ms")
+        self.doc_registry[display_name] = result
+        logger.info(f"Ingested {display_name}: {len(chunks)} chunks in {elapsed}ms")
         return result
 
     def _rebuild_bm25(self):
@@ -264,14 +265,14 @@ Context:
 
     # ── Hybrid Retrieval ───────────────────────────────────────────────────────
 
-    def retrieve_hybrid(self, query: str) -> List[RetrievedChunk]:
+    def retrieve_hybrid(self, query: str, expanded_queries: Optional[List[str]] = None) -> List[RetrievedChunk]:
         """
-        1. Expand query into multiple variants
+        1. Expand query into multiple variants (if not precomputed)
         2. Run dense (Chroma) + sparse (BM25) retrieval for each
         3. Fuse with Reciprocal Rank Fusion
         4. Optionally compress with contextual extraction
         """
-        expanded = self.expand_query(query)
+        expanded = expanded_queries if expanded_queries is not None else self.expand_query(query)
 
         # Aggregate dense results across all query variants
         all_dense: List[Tuple[Document, float]] = []
@@ -334,7 +335,7 @@ Context:
         t0 = time.time()
 
         expanded = self.expand_query(question)
-        chunks = self.retrieve_hybrid(question)
+        chunks = self.retrieve_hybrid(question, expanded_queries=expanded)
 
         if not chunks:
             return RAGResponse(
